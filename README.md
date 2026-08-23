@@ -58,28 +58,26 @@
 摒弃原31维稀疏特征，将节点特征重构为 **12维风控业务节点特征**，并在各时序窗口内独立进行统一 $\log1p$ 极值平滑与 `StandardScaler` 标准化处理：
 
 #### (1) 资金规模与体量
->目标：捕捉**大体量+小笔均**的拆单洗钱模式
-- `total_amount_paid` / `total_amount_received`：总转出 / 总转入金额
-- `avg_amount_paid` / `avg_amount_received`：笔均转出 / 笔均转入金额
+>目标：捕捉大体量+小笔均的拆单洗钱模式
+- `total_amount_paid` / `total_amount_received`：总转出 / 总转入金额 （取对数+归一化）
+- `avg_amount_paid` / `avg_amount_received`：笔均转出 / 笔均转入金额（取对数+归一化）
 
 #### (2) 资金流动与留存
 >目标：识别过路中转户（资金零留存）、高复杂度交易
-- `net_flow_ratio`：资金净流转率，计算公式 $\boldsymbol{(Rec-Paid)/(Rec+Paid+1e^{-5})}$
-- `unique_currency_count`：涉及交易货币种类去重总数
+- `net_flow_ratio`：资金净流转率，计算公式 $\boldsymbol{(Rec-Paid)/(Rec+Paid+1e^{-5})}$ （归一化）
+- `unique_currency_count`：涉及交易货币种类去重总数 （归一化）
 
 #### (3) 图拓扑与交互度
->目标：识别账户在网络中的**归集、分发**角色
-- `unique_out_accounts` / `unique_in_accounts`：出度 / 入度去重对手账户数
+>目标：识别账户在网络中的归集与分发角色
+- `unique_out_accounts` / `unique_in_accounts`：出度 / 入度去重对手账户数 （取对数+归一化）
 
 #### (4) 行为频次与时序
 >目标：捕捉高频拆单、自动化定时归集行为
-- `total_out_count` / `total_in_count`：总转出 / 总转入笔数
-- `avg_T_out` / `avg_T_in`：对手平均转出 / 转入频次
+- `total_out_count` / `total_in_count`：总转出 / 总转入笔数 （取对数+归一化）
+- `avg_T_out` / `avg_T_in`：对手平均转出 / 转入频次 （取对数+归一化）
 
-- 
-> **数据预处理说明：**
-> * **取对数 ($\log1p$)**：仅对具有极端长尾分布的金额与频次特征进行对数压缩，消除大数值对梯度的冲击；有界与小数值特征保持原始形态。
-> * **归一化 (StandardScaler)**：对全体 12 维特征统一做归一化处理，将均值拉到 0、标准差拉到 1，消除维度间的量级差异，保障 GATv2 模型对各维特征的均衡学习。
+数据预处理说明：
+
 
 
 (1)、资金规模与体量（捕捉“大体量+小笔均”的拆单洗钱模式）
