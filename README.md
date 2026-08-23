@@ -55,29 +55,28 @@
 
 **优化方案**：
 
-摒弃原31维稀疏特征，将节点特征重构为 **12维风控业务节点特征**，并在各时序窗口内独立进行统一 $\log1p$ 极值平滑与 `StandardScaler` 标准化处理：
+摒弃原31维稀疏特征，将节点特征重构为 **12维风控业务节点特征**，并在各时序窗口内独立进行统一 $\log1p$ 极值平滑与标准化处理：
 
 #### (1) 资金规模与体量
 >目标：捕捉大体量+小笔均的拆单洗钱模式
-- `total_amount_paid` / `total_amount_received`：总转出 / 总转入金额 （取对数+归一化）
-- `avg_amount_paid` / `avg_amount_received`：笔均转出 / 笔均转入金额（取对数+归一化）
+- `total_amount_paid` / `total_amount_received`：总转出 / 总转入金额 
+- `avg_amount_paid` / `avg_amount_received`：笔均转出 / 笔均转入金额
 
 #### (2) 资金流动与留存
 >目标：识别过路中转户（资金零留存）、高复杂度交易
-- `net_flow_ratio`：资金净流转率，计算公式 $\boldsymbol{(Rec-Paid)/(Rec+Paid+1e^{-5})}$ （归一化）
-- `unique_currency_count`：涉及交易货币种类去重总数 （归一化）
+- `net_flow_ratio`：资金净流转率，计算公式 $\boldsymbol{(Rec-Paid)/(Rec+Paid+1e^{-5})}$ 
+- `unique_currency_count`：涉及交易货币种类去重总数 
 
 #### (3) 图拓扑与交互度
 >目标：识别账户在网络中的归集与分发角色
-- `unique_out_accounts` / `unique_in_accounts`：出度 / 入度去重对手账户数 （取对数+归一化）
+- `unique_out_accounts` / `unique_in_accounts`：出度 / 入度去重对手账户数 
 
 #### (4) 行为频次与时序
 >目标：捕捉高频拆单、自动化定时归集行为
-- `total_out_count` / `total_in_count`：总转出 / 总转入笔数 （取对数+归一化）
-- `avg_T_out` / `avg_T_in`：对手平均转出 / 转入频次 （取对数+归一化）
+- `total_out_count` / `total_in_count`：总转出 / 总转入笔数 
+- `avg_T_out` / `avg_T_in`：对手平均转出 / 转入频次 
 
----
-### 统一数据预处理规则
+**统一数据预处理规则**
 所有特征**在每个时序窗口内独立进行处理**
 1. **金额、频次类特征**：先执行 `log1p()` 对数变换，再使用 `StandardScaler` 标准化处理
 2. **比率、计数类特例**
@@ -86,27 +85,8 @@
 
 
 
-(1)、资金规模与体量（捕捉“大体量+小笔均”的拆单洗钱模式）
 
-total_amount_paid、total_amount_received ：总转出/转入金额   
 
-avg_amount_paid、avg_amount_received：笔均转出/转入金额  
-
-(2)、资金流动与留存（捕捉资金零留存(过路中转户)与高复杂度洗钱）
-
-net_flow_ratio：资金净流转率，公式=(Rec−Paid)/(Rec+Paid+1e−5)
-
-unique_currency_count：涉及交易货币种类去重总数
-
-(3)、图拓扑与交互度（识别“归集”与“分发”网络角色）
-
-unique_out_accounts、unique_in_accounts：出/入度去重对手数
-
-(4)、行为频次与时序（捕捉高频拆单与自动化定时归集）
-
-total_out_count、total_in_count：总转出/准入笔数
-
-avg_T_out、avg_T_in：对手平均转出/转入频次
 
 
 
@@ -214,3 +194,29 @@ C.关联密度特征（平均单对单交易频次）：（该账户发起的总
 
 (1)、当前是静态基线，工业级要用滚动时间窗口动态构图。
 (2)、后期需要再建一个边分类的模型，作为另一个任务。
+
+
+
+(1)、资金规模与体量（捕捉“大体量+小笔均”的拆单洗钱模式）
+
+total_amount_paid、total_amount_received ：总转出/转入金额   
+
+avg_amount_paid、avg_amount_received：笔均转出/转入金额  
+
+(2)、资金流动与留存（捕捉资金零留存(过路中转户)与高复杂度洗钱）
+
+net_flow_ratio：资金净流转率，公式=(Rec−Paid)/(Rec+Paid+1e−5)
+
+unique_currency_count：涉及交易货币种类去重总数
+
+(3)、图拓扑与交互度（识别“归集”与“分发”网络角色）
+
+unique_out_accounts、unique_in_accounts：出/入度去重对手数
+
+(4)、行为频次与时序（捕捉高频拆单与自动化定时归集）
+
+total_out_count、total_in_count：总转出/准入笔数
+
+avg_T_out、avg_T_in：对手平均转出/转入频次
+
+
