@@ -57,6 +57,29 @@
 
 摒弃原31维稀疏特征，将节点特征重构为 **4 大风控业务维度、共 12 维稠密特征**，并在各时序窗口内独立进行统一 $\log1p$ 极值平滑与 `StandardScaler` 标准化处理：
 
+### 📊 节点特征工程 (Node Features Specification)
+
+为了全面捕捉洗钱行为在**资金规模**、**结构流转**、**网络拓扑**及**交易频次**四个维度的异常模式，模型构建了 12 维账户级节点特征。所有偏态数值指标均经过对数平滑，且全量特征统一进行了 Z-Score 标准化（Standard Scaling），以确保梯度更新的数值稳定性。
+
+| 特征类别 | 特征名称 (Feature Name) | 物理含义与风控痛点 | 对数平滑 ($\log1p$) | Z-Score 标准化 |
+| :--- | :--- | :--- | :---: | :---: |
+| **资金规模** | `total_amount_paid` | 累积转出总金额 (捕捉大额资金洗钱) | ✔ | ✔ |
+| | `total_amount_received` | 累积转入总金额 (捕捉大额资金归集) | ✔ | ✔ |
+| | `avg_amount_paid` | 笔均转出金额 (配合总额识别“拆单/ Structuring”) | ✔ | ✔ |
+| | `avg_amount_received` | 笔均转入金额 (配合总额识别“拆单/ Structuring”) | ✔ | ✔ |
+| **资金流转** | `net_flow_ratio` | 净资金流转率 $\frac{\text{Rec}-\text{Paid}}{\text{Rec}+\text{Paid}+\epsilon}$ (识别过路/中转户) | ✖ | ✔ |
+| | `unique_currency_count` | 涉案交易货币去重种类数 (捕捉跨境/多币种洗钱) | ✖ | ✔ |
+| **图拓扑** | `unique_out_accounts` | 节点出度 (转出去重对手数，识别分发源) | ✔ | ✔ |
+| | `unique_in_accounts` | 节点入度 (转入去重对手数，识别归集汇点) | ✔ | ✔ |
+| **行为频次** | `total_out_count` | 累积转出总笔数 (捕捉自动化高频转账) | ✔ | ✔ |
+| | `total_in_count` | 累积转入总笔数 (捕捉自动化高频归集) | ✔ | ✔ |
+| | `avg_T_out` | 对手方平均转出频次 $\frac{\text{total\_out\_count}}{\text{unique\_out\_accounts}}$ | ✔ | ✔ |
+| | `avg_T_in` | 对手方平均转入频次 $\frac{\text{total\_in\_count}}{\text{unique\_in\_accounts}}$ | ✔ | ✔ |
+
+> **💡 预处理逻辑说明 (Data Preprocessing Methodology)：**
+> 1. **对数平滑 ($\log1p$)**：仅作用于具有极端长尾分布（Long-tailed Distribution）的金额与频次指标，消除极端大值对梯度的冲击；有界特征（如 $net\_flow\_ratio \in [-1, 1]$）保持原始物理形态。
+> 2. **Z-Score 标准化**：对全体 12 维特征做 $\frac{x - \mu}{\sigma}$ 变换，将所有特征的均值归零 ($\mu=0$)、标准差归一 ($\sigma=1$)，消除量级差异，保障 GATv2 注意力机制对各维度特征的均衡学习。
+>
 
 (1)、资金规模与体量（捕捉“大体量+小笔均”的拆单洗钱模式）
 
