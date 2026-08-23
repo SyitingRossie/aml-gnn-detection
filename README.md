@@ -61,17 +61,17 @@
 
 #### (2) 资金流动与留存
 目标：识别过路中转户（资金零留存）、高复杂度交易
-- `net_flow_ratio`：资金净流转率，计算公式 $\boldsymbol{(Rec-Paid)/(Rec+Paid+1e^{-5})}$ 
-- `unique_currency_count`：涉及交易货币种类去重总数 
+- net_flow_ratio：资金净流转率，计算公式 $\boldsymbol{(Rec-Paid)/(Rec+Paid+1e^{-5})}$ 
+- unique_currency_count：涉及交易货币种类去重总数 
 
 #### (3) 图拓扑与交互度
 目标：识别账户在网络中的归集与分发角色
-- `unique_out_accounts` / `unique_in_accounts`：出度 / 入度去重对手账户数 
+- unique_out_accounts / unique_in_accounts：出度 / 入度去重对手账户数 
 
 #### (4) 行为频次与时序
 目标：捕捉高频拆单、自动化定时归集行为
-- `total_out_count` / `total_in_count`：总转出 / 总转入笔数 
-- `avg_T_out` / `avg_T_in`：对手平均转出 / 转入频次 
+- total_out_count / total_in_count：总转出 / 总转入笔数 
+- avg_T_out / avg_T_in：对手平均转出 / 转入频次 
 
 **统一数据预处理规则：**
 所有特征**在每个时序窗口内独立进行处理**
@@ -102,8 +102,7 @@
 2.除转账方式(独热编码)、is_cross_currency外，均进行了标准化(StandardScaler)处理
 
 
-3、缺乏对样本数据不平衡的处理
-
+## 3.缺乏对样本数据不平衡的处理
 (1)、原是在epoch循环之前一次性随机采样，那每轮epoch样本顺序都一样，多轮后容易过拟合。
 
 4、GAT模型构建：
