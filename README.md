@@ -56,8 +56,8 @@
 
 1.资金规模与体量
 目标：捕捉大体量+小笔均的拆单洗钱模式
-- `total_amount_paid` / `total_amount_received`：总转出 / 总转入金额 
-- `avg_amount_paid` / `avg_amount_received`：笔均转出 / 笔均转入金额
+- total_amount_paid / total_amount_received：总转出 / 总转入金额 
+- avg_amount_paid / avg_amount_received：笔均转出 / 笔均转入金额
 
 #### (2) 资金流动与留存
 目标：识别过路中转户（资金零留存）、高复杂度交易
