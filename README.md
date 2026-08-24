@@ -134,21 +134,9 @@
 完善验证指标：增加PR-AUC（AP)、ROC-AUC、recall、precision、F4 score 
 
 
-4、GAT卷积网络搭建：
-
-(1)、GATConv中加入edge_dim参数，使模型没有学习交易边特征；加入自环边add_self_loops=True，加入自环边的交易边信息fill_value="mean"。
-
-(2）、用GATv2Conv替代GATConv。
-
-
-5、优化器：优化器从SGD换成Adam。
-
-6、完善验证指标：增加PR-AUC（AP)、ROC-AUC、recall、precision、F4 score 
-
-
 ## 五、其他优化设想
 
-目前ImprovedGAT.forward 中预留了return_embedding=True 开关，下一步可以写一段代码：抽取 GNN 的节点 Embedding，拼上原始节点的 tabular 特征，喂给 XGBoost / LightGBM 做二阶段分类。
+目前ImprovedGAT.forward中预留了return_embedding=True 开关，下一步可以写一段代码：抽取GNN的节点Embedding，拼上原始节点的tabular特征，喂给 XGBoost / LightGBM 做二阶段分类。
 
 ## 六、局限
 
