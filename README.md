@@ -146,11 +146,11 @@
 6、完善验证指标：增加PR-AUC（AP)、ROC-AUC、recall、precision、F4 score 
 
 
-五、其他优化设想
+## 五、其他优化设想
 
 目前ImprovedGAT.forward 中预留了return_embedding=True 开关，下一步可以写一段代码：抽取 GNN 的节点 Embedding，拼上原始节点的 tabular 特征，喂给 XGBoost / LightGBM 做二阶段分类。
 
-六、局限
+## 六、局限
 
 1. 当前是静态基线，工业级要用滚动时间窗口动态构图。
 2. 后期需要再建一个边分类的模型，作为另一个任务。
